@@ -60,45 +60,7 @@ xt_status jabber_pkt_iq(struct xt_node *node, gpointer data)
 		xt_add_attr(reply, "xmlns", s);
 
 		/* Of course this is a very essential query to support. ;-) */
-		if (strcmp(s, XMLNS_VERSION) == 0) {
-			xt_add_child(reply, xt_new_node("name", set_getstr(&ic->acc->set, "user_agent"), NULL));
-			xt_add_child(reply, xt_new_node("version", BITLBEE_VERSION, NULL));
-			xt_add_child(reply, xt_new_node("os", ARCH, NULL));
-		} else if (strcmp(s, XMLNS_TIME_OLD) == 0) {
-			time_t time_ep;
-			char buf[1024];
-
-			buf[sizeof(buf) - 1] = 0;
-			time_ep = time(NULL);
-
-			strftime(buf, sizeof(buf) - 1, "%Y%m%dT%H:%M:%S", gmtime(&time_ep));
-			xt_add_child(reply, xt_new_node("utc", buf, NULL));
-
-			strftime(buf, sizeof(buf) - 1, "%Z", localtime(&time_ep));
-			xt_add_child(reply, xt_new_node("tz", buf, NULL));
-		} else if (strcmp(s, XMLNS_TIME) == 0) {
-			time_t time_ep;
-			char buf[1024];
-
-			buf[sizeof(buf) - 1] = 0;
-			time_ep = time(NULL);
-
-			xt_free_node(reply);
-			reply = xt_new_node("time", NULL, NULL);
-			xt_add_attr(reply, "xmlns", XMLNS_TIME);
-
-			strftime(buf, sizeof(buf) - 1, "%Y%m%dT%H:%M:%SZ", gmtime(&time_ep));
-			xt_add_child(reply, xt_new_node("utc", buf, NULL));
-
-			strftime(buf, sizeof(buf) - 1, "%z", localtime(&time_ep));
-			if (strlen(buf) >= 5) {
-				buf[6] = '\0';
-				buf[5] = buf[4];
-				buf[4] = buf[3];
-				buf[3] = ':';
-			}
-			xt_add_child(reply, xt_new_node("tzo", buf, NULL));
-		} else if (strcmp(s, XMLNS_PING) == 0) {
+		if (strcmp(s, XMLNS_PING) == 0) {
 			xt_free_node(reply);
 			reply = jabber_make_packet("iq", "result", xt_find_attr(node, "from"), NULL);
 			if ((s = xt_find_attr(node, "id"))) {
